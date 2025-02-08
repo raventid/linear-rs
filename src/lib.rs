@@ -4,6 +4,13 @@ pub struct MustUseChannel<S: DropHelper> {
 }
 
 impl<S: DropHelper> MustUseChannel<S> {
+    pub fn new(chan: i32) -> MustUseChannel<Undroppable> {
+        MustUseChannel {
+            _s: Undroppable {},
+            chan,
+        }
+    }
+
     pub fn send(self, message: i32) -> MustUseChannel<Droppable> {
         let new_a = MustUseChannel {
             _s: Droppable {},
@@ -15,13 +22,13 @@ impl<S: DropHelper> MustUseChannel<S> {
     }
 }
 
-trait DropHelper: Sized {
+pub trait DropHelper: Sized {
     fn specialized_drop(_a: &mut MustUseChannel<Self>);
 }
 
 // State type options.
-struct Undroppable {} // expecting to call send on a channel
-struct Droppable {} // channel has been used and can be dropped now
+pub struct Undroppable {} // expecting to call send on a channel
+pub struct Droppable {} // channel has been used and can be dropped now
 
 impl DropHelper for Undroppable {
     fn specialized_drop(_a: &mut MustUseChannel<Self>) {
